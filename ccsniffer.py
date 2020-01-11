@@ -37,6 +37,7 @@ class CC2531:
 
     DATA_EP_CC2531 = 0x83
     DATA_EP_CC2530 = 0x82
+    DATA_EP_CC2540 = 0x83
     DATA_TIMEOUT = 2500
 
     DIR_OUT = 0x40
@@ -66,6 +67,11 @@ class CC2531:
                 # Try CC2530
                 CC2531.DATA_EP = CC2531.DATA_EP_CC2530
                 self.dev = usb.core.find(idVendor=0x11a0, idProduct=0xeb20)
+            if self.dev is None:
+                # Try CC2540
+                CC2531.DATA_EP = CC2531.DATA_EP_CC2540
+                self.dev = usb.core.find (idVendor=0x0451, idProduct= 0x16b3)
+
         except usb.core.USBError:
             raise OSError("Permission denied, you need to add an udev rule for this device", errno=errno.EACCES)
     
@@ -192,7 +198,7 @@ class CC2531:
     def __repr__(self):
 
         if self.dev:
-            return "%s <Channel: %d>" % (self.name, self.channel)
+            return f"{self.name} <Channel: {self.channel}>"
         else:
             return "Not connected"
 
@@ -227,13 +233,13 @@ class Packet:
 if __name__ == "__main__":
 
     def callback(packet):
-        print "-"*30
-        print packet
-        print "-"*30
+        print ("-"*30)
+        print (packet)
+        print ("-"*30)
 
     sniffer = CC2531(callback)
     
-    print sniffer
+    print (sniffer)
     sniffer.start()
     time.sleep(10)
     sniffer.stop()
